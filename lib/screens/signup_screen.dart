@@ -1,9 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lifelens/screens/phone_verification_screen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
-import '../firebase_auth/firebase_auth_sevice.dart';
 
 class SignUp extends StatefulWidget {
   static const routeName = '/signup';
@@ -16,11 +15,11 @@ class SignUp extends StatefulWidget {
 
 class _SignUpState extends State<SignUp> {
   final _formKey = GlobalKey<FormState>();
-  final FirebaseAuthService _auth = FirebaseAuthService();
-
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+  TextEditingController();
 
   bool _isLoading = false;
 
@@ -29,13 +28,23 @@ class _SignUpState extends State<SignUp> {
     _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  void _signUp() async {
+  bool passwordConfirmed() {
+    return _passwordController.text.trim() ==
+        _confirmPasswordController.text.trim();
+  }
+
+  Future<void> _signUp() async {
     if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    if (!passwordConfirmed()) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please complete the form')),
+        const SnackBar(content: Text("Passwords do not match")),
       );
       return;
     }
@@ -45,16 +54,24 @@ class _SignUpState extends State<SignUp> {
     });
 
     try {
-      String email = _emailController.text.trim();
-      String password = _passwordController.text.trim();
-      User? user = await _auth.signUpWithEmailAndPassword(email, password);
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
 
-      if (user != null) {
-        print("User successfully registered: ${user.uid}");
-        Navigator.pushNamed(context, "/otp"); // Navigate to OTP screen
-      }
+      // Add user details to Firestore
+      await FirebaseFirestore.instance.collection('users').add({
+        'Your name': _usernameController.text.trim(),
+        'Email': _emailController.text.trim(),
+      });
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const PhoneVerificationScreen(),
+        ),
+      );
     } catch (e) {
-      print("Error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("An error occurred: $e")),
       );
@@ -76,9 +93,9 @@ class _SignUpState extends State<SignUp> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 20),
-              Image.network(
-                "https://i.postimg.cc/nz0YBQcH/Logo-light.png",
-                height: 100,
+              Image.asset(
+                "assets/Vector.png",
+                height: 200,
               ),
               const SizedBox(height: 20),
               Text(
@@ -101,7 +118,9 @@ class _SignUpState extends State<SignUp> {
                         filled: true,
                         fillColor: Color(0xFFF5FCF9),
                         contentPadding: EdgeInsets.symmetric(
-                            horizontal: 24.0, vertical: 16.0),
+                          horizontal: 24.0,
+                          vertical: 16.0,
+                        ),
                         border: OutlineInputBorder(
                           borderSide: BorderSide.none,
                           borderRadius: BorderRadius.all(Radius.circular(50)),
@@ -122,7 +141,9 @@ class _SignUpState extends State<SignUp> {
                         filled: true,
                         fillColor: Color(0xFFF5FCF9),
                         contentPadding: EdgeInsets.symmetric(
-                            horizontal: 24.0, vertical: 16.0),
+                          horizontal: 24.0,
+                          vertical: 16.0,
+                        ),
                         border: OutlineInputBorder(
                           borderSide: BorderSide.none,
                           borderRadius: BorderRadius.all(Radius.circular(50)),
@@ -148,7 +169,9 @@ class _SignUpState extends State<SignUp> {
                         filled: true,
                         fillColor: Color(0xFFF5FCF9),
                         contentPadding: EdgeInsets.symmetric(
-                            horizontal: 24.0, vertical: 16.0),
+                          horizontal: 24.0,
+                          vertical: 16.0,
+                        ),
                         border: OutlineInputBorder(
                           borderSide: BorderSide.none,
                           borderRadius: BorderRadius.all(Radius.circular(50)),
@@ -163,21 +186,24 @@ class _SignUpState extends State<SignUp> {
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
+                      controller: _confirmPasswordController,
                       obscureText: true,
                       decoration: const InputDecoration(
                         hintText: 'Confirm Password',
                         filled: true,
                         fillColor: Color(0xFFF5FCF9),
                         contentPadding: EdgeInsets.symmetric(
-                            horizontal: 24.0, vertical: 16.0),
+                          horizontal: 24.0,
+                          vertical: 16.0,
+                        ),
                         border: OutlineInputBorder(
                           borderSide: BorderSide.none,
                           borderRadius: BorderRadius.all(Radius.circular(50)),
                         ),
                       ),
                       validator: (value) {
-                        if (value == null || value != _passwordController.text) {
-                          return 'Passwords do not match';
+                        if (value == null || value.isEmpty) {
+                          return 'Confirm your password';
                         }
                         return null;
                       },
@@ -218,22 +244,31 @@ class _SignUpState extends State<SignUp> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    ElevatedButton.icon(style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)
-                      )
-                    ),   onPressed:() async{
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => const PhoneVerificationScreen(),));
-                    },
-                        label: const Text("Phone Verification",
-                        style: TextStyle(color: Colors.white),),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                            const PhoneVerificationScreen(),
+                          ),
+                        );
+                      },
+                      label: const Text(
+                        "Phone Verification",
+                        style: TextStyle(color: Colors.white),
+                      ),
                       icon: const Icon(
                         FontAwesomeIcons.phone,
-                        color:Colors.white
+                        color: Colors.white,
                       ),
                     )
-
                   ],
                 ),
               ),

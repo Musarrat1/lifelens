@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
         SplashScreen.routeName: (context) => SplashScreen(),
         Login.routeName: (context) => Login(),
         SignUp.routeName: (context) => SignUp(),
-        OTP.routeName: (context) => const OTP(verficationID: '',),
+        OTP.routeName: (context) => const OTP( verificationID: '',),
         Dashboard.routeName: (context) => Dashboard(),
 
       },

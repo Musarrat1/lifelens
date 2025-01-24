@@ -5,37 +5,32 @@ import 'package:lifelens/screens/userProfile.dart';
 class Dashboard extends StatelessWidget {
   static const routeName = '/dashboard';
 
+  const Dashboard({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('LifeLens',style: TextStyle(color: Colors.green),),
+        title: const Text(
+          'LifeLens',
+          style: TextStyle(color: Colors.green),
+        ),
         backgroundColor: Colors.white,
+        elevation: 0,
       ),
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
-
-
-
-
-
-
-
-
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            SizedBox(height: 40),
-            Text(
-              'Welcome to the Lifelens',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.green
-              ),
+            const SizedBox(height: 40),
+            const Text(
+              'Welcome to LifeLens',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.green),
               textAlign: TextAlign.start,
             ),
-            SizedBox(height: 40),
+            const SizedBox(height: 40),
             Expanded(
               child: GridView.count(
                 crossAxisCount: 2,
@@ -46,63 +41,68 @@ class Dashboard extends StatelessWidget {
                     icon: Icons.person,
                     label: 'User Profile',
                     onTap: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=> Userprofile()),);
-                      // Navigate to User Profile
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) =>  Userprofile()),
+                      );
                     },
                   ),
                   _DashboardItem(
                     icon: Icons.monetization_on,
                     label: 'Financial Overview',
                     onTap: () {
-                      // Navigate to Financial Overview
+                      // Handle navigation
                     },
                   ),
                   _DashboardItem(
                     icon: Icons.schedule,
                     label: 'Schedule Overview',
                     onTap: () {
-                      // Navigate to Schedule Overview
+                      // Handle navigation
                     },
                   ),
                   _DashboardItem(
                     icon: Icons.check_circle,
                     label: 'View Tasks',
                     onTap: () {
-                      // Navigate to View Tasks
+                      // Handle navigation
                     },
                   ),
                   _DashboardItem(
                     icon: Icons.contact_phone,
                     label: 'Contact Details',
                     onTap: () {
-                      // Navigate to Contact Details
+                      // Handle navigation
                     },
                   ),
                   _DashboardItem(
                     icon: Icons.health_and_safety,
                     label: 'Health',
                     onTap: () {
-                      // Navigate to Health
+                      // Handle navigation
                     },
                   ),
                 ],
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=> SplashScreen()),);
-                  // Add logout functionality
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => SplashScreen()),
+                  );
                 },
-                child: Text('Log Out'),
+                child: const Text('Log Out'),
                 style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white, backgroundColor: Colors.green,
-                  padding: EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.green,
+                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
           ],
         ),
       ),
@@ -135,10 +135,10 @@ class _DashboardItem extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(icon, size: 40, color: Colors.green),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text(
               label,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),
               textAlign: TextAlign.center,
             ),
           ],
@@ -147,4 +147,3 @@ class _DashboardItem extends StatelessWidget {
     );
   }
 }
-

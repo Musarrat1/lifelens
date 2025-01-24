@@ -23,7 +23,7 @@ class Login extends StatelessWidget {
                   SizedBox(height: constraints.maxHeight * 0.1),
                   Center(
                     child: Image.asset(
-                      'assets/Vector.png', // Ensure this asset exists
+                      'assets/Vector.png',height: 200, // Ensure this asset exists
                     ),
                   ),
                   SizedBox(height: constraints.maxHeight * 0.05),

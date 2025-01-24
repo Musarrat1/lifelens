@@ -2,11 +2,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'dashboard.dart';
+
 class OTP extends StatefulWidget {
   static const routeName = '/otp';
-  final String verficationID;
+  final String verificationID;
 
-  const OTP({super.key, required this.verficationID});
+  const OTP({super.key,required this.verificationID});
 
   @override
   _OtpFormState createState() => _OtpFormState();
@@ -122,7 +124,7 @@ class _OtpFormState extends State<OTP> {
 
                 try {
                   PhoneAuthCredential credential = PhoneAuthProvider.credential(
-                    verificationId: widget.verficationID,
+                    verificationId: widget.verificationID,
                     smsCode: otp,
                   );
 
@@ -130,6 +132,10 @@ class _OtpFormState extends State<OTP> {
                   await FirebaseAuth.instance.signInWithCredential(credential);
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Successfully verified!')),
+                  );
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => Dashboard()),
                   );
                   // Navigate to the next screen or handle successful verification here.
                 } on FirebaseAuthException catch (ex) {
